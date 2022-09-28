@@ -1,0 +1,21 @@
+{
+  "name": "LinkedIn Bot for ClickUp",
+  "description": "A linkedin bot for ClickUp",
+  "version": "1.0",
+  "manifest_version": 3,
+  "action": {
+      "default_popup": "popup.html"
+  },
+  "background": {
+      "service_worker": "eventPage.js",
+      "type": "module"
+  },
+  "permissions": [
+      "storage",
+      "tabs"
+  ],
+  "host_permissions": [
+    "https://api.clickup.com/*"
+]
+
+}
