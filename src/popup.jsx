@@ -205,8 +205,16 @@ function Popup() {
             }
         })
         const jdata = await data.json()
-
         SetTasks(jdata.tasks)
+
+
+        let clone = Tasks.tags?.forEach((item) => {
+        
+        })
+
+
+
+
 
     }
 
@@ -399,10 +407,13 @@ function Popup() {
                                                     Your LinkendIn posts</DrawerHeader>
 
                                                 <DrawerBody>
-                                                    <Accordion allowToggle h={'480px'} overflow={'scroll'}>
+                                                    <Accordion allowToggle h={'max-content'} overflow={'scroll'}>
                                                         {
                                                             Tasks && Tasks.length > 0 ? (
                                                                 Tasks?.map((item, i) => (
+
+
+
                                                                     <AccordionItem minH={'10vh'} borderTop={'0px'} py={3} key={i}>
                                                                         <h2>
                                                                             <AccordionButton>
@@ -425,10 +436,11 @@ function Popup() {
                                                                         </h2>
                                                                         <AccordionPanel h={'40vh'} pb={4}>
                                                                             <SimpleGrid>
-                                                                                
+
                                                                             </SimpleGrid>
                                                                         </AccordionPanel>
                                                                     </AccordionItem>
+
                                                                 ))
                                                             ) : (<Box>
                                                                 No tasks</Box>)
