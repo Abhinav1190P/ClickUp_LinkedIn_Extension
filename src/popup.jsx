@@ -16,13 +16,16 @@ import {
     AvatarBadge,
     PopoverCloseButton,
     PopoverTrigger,
-    PopoverHeader
+    PopoverHeader,
+    Link
 
 } from "@chakra-ui/react";
 import { ChakraProvider } from '@chakra-ui/react'
 import { HiOutlineHome } from 'react-icons/hi'
 import { BsThreeDotsVertical } from 'react-icons/bs'
 import { RiDraftLine, RiAddLine } from 'react-icons/ri'
+import { MdFilterList } from 'react-icons/md'
+import { AiTwotoneFolderOpen } from 'react-icons/ai'
 import axios from "axios";
 
 function Popup() {
@@ -33,6 +36,9 @@ function Popup() {
     const [Teams, SetTeams] = useState([])
     const [CurrentTeamAvatar, setCurrentTeamAvatar] = useState('')
     const [currentTeam, setCurrentTeam] = useState('')
+    const [currentSpace, setCurrentSpace] = useState('')
+    const [Spaces, SetSpaces] = useState([])
+    const [Folders, SetFolders] = useState([])
 
     const gradients = [
         {
@@ -134,6 +140,42 @@ function Popup() {
         }
     })
 
+    useEffect(() => {
+        const GetMySpaces = async () => {
+            if (currentTeam !== '') {
+                const data = await fetch(`https://api.clickup.com/api/v2/team/${currentTeam}/space`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        "Authorization": AccessToken
+                    }
+                })
+                const jdata = await data.json()
+                SetSpaces(jdata.spaces)
+            }
+
+        }
+        GetMySpaces()
+    }, [currentTeam])
+
+    useEffect(() => {
+        if (currentSpace !== '') {
+            const GetMyFolders = async () => {
+
+                const data = await fetch(`https://api.clickup.com/api/v2/space/${currentSpace}/folder`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        "Authorization": AccessToken
+                    }
+                })
+                const jdata = await data.json()
+                SetFolders(jdata.folders)
+
+            }
+            GetMyFolders()
+        }
+    }, [currentSpace])
 
 
     useEffect(() => {
@@ -159,7 +201,7 @@ function Popup() {
     }, [AccessToken])
 
     return (
-        <VStack margin={0} padding={0} borderRadius={'5px'} w="400px" h="500px">
+        <VStack margin={0} padding={0} borderRadius={'5px'} w="400px" h="600px">
             <VStack spacing={10} p={6} w="100%" h="80%">
                 <HStack w="100%" h="10%" alignItems={'center'}>
                     <VStack
@@ -228,8 +270,9 @@ function Popup() {
                 <Accordion
                     allowToggle
                     overflow={'scroll'} h="480px" w="100%">
-                    {posts?.map((item, i) => (
+                    {Spaces?.map((item, i) => (
                         <AccordionItem
+                            onClick={() => { setCurrentSpace(item.id) }}
                             borderTop={'none'}
                             borderColor={'gray.100'}
                             key={i} w="100%">
@@ -254,8 +297,60 @@ function Popup() {
                                 bgRepeat="no-repeat"
                                 pb={4}>
                                 <VStack w="100%" h="100%">
-                                    <Box w="100%" h="95%">
-                                        Hey
+                                    <Box w="100%" h="95%" bg="white">
+                                        {
+                                            Folders && Folders.length > 0 ? (
+                                                Folders?.map((item, i) => (
+                                                    <Box key={i}>
+
+                                                        <VStack py={3} alignItems={'flex-start'} px={3}>
+
+                                                            <Link
+                                                                color={'purple.400'}
+                                                                fontFamily={'monospace'}
+                                                                fontWeight={700} fontSize={'lg'}>
+                                                                <Icon as={AiTwotoneFolderOpen} w={3} h={3} /> {item.name}
+                                                            </Link>
+                                                            <Text
+                                                                color={'purple.400'}
+                                                                fontFamily={'monospace'}
+                                                                fontWeight={700}
+                                                                fontSize={'15px'}
+                                                            >
+                                                                <Icon as={MdFilterList} w={3} h={3} /> Lists:
+                                                            </Text>
+                                                            {
+                                                                item.lists && item.lists.length > 0 ? (
+                                                                    item.lists?.map((item2, i) => (
+                                                                        <Box w="100%" key={i}>
+
+                                                                            <Link
+                                                                                color={'purple.400'}
+                                                                                fontFamily={'monospace'}
+                                                                                fontWeight={700}
+                                                                                fontSize={'13px'}
+                                                                                onClick={() => { setCurrentList(item2.id); setCurrentFolder(item.id); GetMyTasks(item2.id); LOnOpen() }}
+                                                                                px={5}
+                                                                            >
+                                                                                {item2.name}
+                                                                            </Link>
+
+                                                                        </Box>
+                                                                    ))
+                                                                ) : (<Box>
+                                                                    No lists
+                                                                </Box>)
+
+
+                                                            }
+
+                                                        </VStack>
+
+                                                    </Box>
+                                                ))
+                                            ) : (<Box>
+                                                No folders</Box>)
+                                        }
                                     </Box>
 
                                     <Flex
@@ -279,6 +374,8 @@ function Popup() {
                                 >{""}</Tag> */}
                         </AccordionItem>
                     ))}
+
+
                 </Accordion>
             </VStack>
             <HStack
