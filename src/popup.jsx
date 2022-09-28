@@ -17,7 +17,17 @@ import {
     PopoverCloseButton,
     PopoverTrigger,
     PopoverHeader,
-    Link
+    Drawer,
+    DrawerBody,
+    DrawerFooter,
+    DrawerHeader,
+    DrawerOverlay,
+    DrawerContent,
+    DrawerCloseButton,
+    useDisclosure,
+    Input,
+    Link,
+    SimpleGrid
 
 } from "@chakra-ui/react";
 import { ChakraProvider } from '@chakra-ui/react'
@@ -39,6 +49,14 @@ function Popup() {
     const [currentSpace, setCurrentSpace] = useState('')
     const [Spaces, SetSpaces] = useState([])
     const [Folders, SetFolders] = useState([])
+    const [currentList, setCurrentList] = useState('')
+    const [currentFolder, setCurrentFolder] = useState('')
+    const { isOpen, onOpen, onClose } = useDisclosure()
+    const btnRef = React.useRef()
+
+
+    const [Lists, SetLists] = useState([])
+    const [Tasks, SetTasks] = useState([])
 
     const gradients = [
         {
@@ -177,6 +195,21 @@ function Popup() {
         }
     }, [currentSpace])
 
+    const GetMyTasks = async (currentList) => {
+
+        const data = await fetch(`https://api.clickup.com/api/v2/list/${currentList}/task`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                "Authorization": AccessToken
+            }
+        })
+        const jdata = await data.json()
+
+        SetTasks(jdata.tasks)
+
+    }
+
 
     useEffect(() => {
         if (AccessToken) {
@@ -201,7 +234,7 @@ function Popup() {
     }, [AccessToken])
 
     return (
-        <VStack margin={0} padding={0} borderRadius={'5px'} w="400px" h="600px">
+        <VStack margin={0} padding={0} borderRadius={'5px'} w="400px" h="500px">
             <VStack spacing={10} p={6} w="100%" h="80%">
                 <HStack w="100%" h="10%" alignItems={'center'}>
                     <VStack
@@ -319,6 +352,7 @@ function Popup() {
                                                             >
                                                                 <Icon as={MdFilterList} w={3} h={3} /> Lists:
                                                             </Text>
+
                                                             {
                                                                 item.lists && item.lists.length > 0 ? (
                                                                     item.lists?.map((item2, i) => (
@@ -328,8 +362,9 @@ function Popup() {
                                                                                 color={'purple.400'}
                                                                                 fontFamily={'monospace'}
                                                                                 fontWeight={700}
+                                                                                ref={btnRef}
                                                                                 fontSize={'13px'}
-                                                                                onClick={() => { setCurrentList(item2.id); setCurrentFolder(item.id); GetMyTasks(item2.id); LOnOpen() }}
+                                                                                onClick={() => { setCurrentList(item2.id); setCurrentFolder(item.id); GetMyTasks(item2.id), onOpen() }}
                                                                                 px={5}
                                                                             >
                                                                                 {item2.name}
@@ -351,6 +386,64 @@ function Popup() {
                                             ) : (<Box>
                                                 No folders</Box>)
                                         }
+                                        <Drawer
+                                            isOpen={isOpen}
+                                            placement='bottom'
+                                            onClose={onClose}
+                                            finalFocusRef={btnRef}
+                                        >
+                                            <DrawerOverlay />
+                                            <DrawerContent h="500px">
+                                                <DrawerCloseButton />
+                                                <DrawerHeader fontWeight={700} fontFamily={'monospace'}>
+                                                    Your LinkendIn posts</DrawerHeader>
+
+                                                <DrawerBody>
+                                                    <Accordion allowToggle h={'480px'} overflow={'scroll'}>
+                                                        {
+                                                            Tasks && Tasks.length > 0 ? (
+                                                                Tasks?.map((item, i) => (
+                                                                    <AccordionItem minH={'10vh'} borderTop={'0px'} py={3} key={i}>
+                                                                        <h2>
+                                                                            <AccordionButton>
+                                                                                <HStack flex='1' textAlign='left'>
+                                                                                    <Tag
+                                                                                        w="11%"
+                                                                                        h="90%"
+                                                                                        borderRadius={'300px'}
+                                                                                        bg={gradients[Math.floor(Math.random() * gradients.length)].backgroundColor}
+                                                                                        bgImage={gradients[Math.floor(Math.random() * gradients.length)].backgroundImage}
+                                                                                        border={'5px solid white'}
+
+                                                                                    >{""}</Tag>
+                                                                                    <Text fontWeight={800} fontFamily={'monospace'}>
+                                                                                        {item.name}
+                                                                                    </Text>
+                                                                                </HStack>
+                                                                                <AccordionIcon />
+                                                                            </AccordionButton>
+                                                                        </h2>
+                                                                        <AccordionPanel h={'40vh'} pb={4}>
+                                                                            <SimpleGrid>
+                                                                                
+                                                                            </SimpleGrid>
+                                                                        </AccordionPanel>
+                                                                    </AccordionItem>
+                                                                ))
+                                                            ) : (<Box>
+                                                                No tasks</Box>)
+                                                        }
+                                                    </Accordion>
+                                                </DrawerBody>
+
+                                                <DrawerFooter>
+                                                    <Button variant='outline' mr={3} onClick={onClose}>
+                                                        Cancel
+                                                    </Button>
+                                                    <Button colorScheme='blue'>Save</Button>
+                                                </DrawerFooter>
+                                            </DrawerContent>
+                                        </Drawer>
                                     </Box>
 
                                     <Flex
@@ -363,15 +456,7 @@ function Popup() {
                                 </VStack>
                             </AccordionPanel>
 
-                            {/* <Tag
-                            w="11%"
-                            h="90%"
-                            borderRadius={'300px'}
-                                bg={gradients[Math.floor(Math.random() * gradients.length)].backgroundColor}
-                                bgImage={gradients[Math.floor(Math.random() * gradients.length)].backgroundImage}
-                                border={'5px solid white'}
-                                marginTop={'8'}
-                                >{""}</Tag> */}
+                            {/*  */}
                         </AccordionItem>
                     ))}
 
