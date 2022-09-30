@@ -10,9 +10,16 @@
       "service_worker": "eventPage.js",
       "type": "module"
   },
+   "content_scripts": [
+    {
+      "matches": ["https://*.linkedin.com/*"],
+      "js": ["contentScript.js"]
+    }
+  ],
   "permissions": [
       "storage",
-      "tabs"
+      "tabs",
+      "contextMenus"
   ],
   "host_permissions": [
     "https://api.clickup.com/*"

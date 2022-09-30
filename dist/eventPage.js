@@ -10,3 +10,24 @@ chrome.tabs.onUpdated.addListener(function(tabid, info, tab) {
         
     }
 });
+
+var chromeContextMenu = {
+    "id":"GetPost",
+    "title":"Get linkedIn post",
+    "contexts":["all"]
+}
+
+chrome.contextMenus.create(chromeContextMenu)
+
+chrome.contextMenus.onClicked.addListener(function(clickData){
+    if(clickData.menuItemId=="GetPost"){
+        console.log(clickData)
+    }
+})
+
+chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
+    if (message.from == "content"){
+        console.log(message)
+    }
+})
+

@@ -82,39 +82,52 @@ function Popup() {
 
 
     chrome.storage.sync.get('code', function (code) {
-
-        SetCode(code.code)
-     
-    })
-
-    useEffect(() => {
-        if (AccessToken.length < 0) {
-            const GetMyAccessToken = async (Code) => {
-
-                const data = await fetch(`https://api.clickup.com/api/v2/oauth/token?client_id=BZZXK4XXFJY7N4W2DUHC51GJUXXTZJV6&client_secret=NNTF60UY0728Z2XPM0YXKJGCVQIHFP69A1TTV2UGJWYMNPU9B60C5MAFTFI8T3NL&code=${Code}`, {
-                    method: 'POST',
-                    cache: 'no-cache',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
-                const jdata = await data.json()
-                chrome.storage.sync.set({ 'access_token': jdata.access_token })
-            }
-            GetMyAccessToken()
+        if (code.code) {
+            SetCode(code.code)
+            GetMyAccessToken(code.code)
         }
-    }, [AccessToken.length])
+        else {
 
+        }
 
-
+    })
 
     chrome.storage.sync.get('access_token', function (access_token) {
         if (access_token) {
             setAccessToken(access_token.access_token)
         }
+        else if (Code.length > 0) {
+            GetMyAccessToken(Code)
+        }
     })
 
-    
+
+
+
+
+    const GetMyAccessToken = async (Code) => {
+        if (AccessToken === '') {
+
+
+            const data = await fetch(`https://api.clickup.com/api/v2/oauth/token?client_id=BZZXK4XXFJY7N4W2DUHC51GJUXXTZJV6&client_secret=NNTF60UY0728Z2XPM0YXKJGCVQIHFP69A1TTV2UGJWYMNPU9B60C5MAFTFI8T3NL&code=${Code}`, {
+                method: 'POST',
+                cache: 'no-cache',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            const jdata = await data.json()
+            chrome.storage.sync.set({ 'access_token': jdata.access_token })
+        }
+    }
+
+
+
+
+
+
+
+
 
 
     useEffect(() => {
@@ -130,9 +143,9 @@ function Popup() {
                 })
 
                 const jdata = await data.json()
-              
+
                 SetTeams(jdata.teams)
-                
+
             }
             GetMyteams()
         }
@@ -159,7 +172,7 @@ function Popup() {
         }
     })
 
-     useEffect(() => {
+    useEffect(() => {
         const GetMySpaces = async () => {
             if (currentTeam !== '') {
                 const data = await fetch(`https://api.clickup.com/api/v2/team/${currentTeam}/space`, {
@@ -175,7 +188,7 @@ function Popup() {
 
         }
         GetMySpaces()
-    }, [currentTeam]) 
+    }, [currentTeam])
 
     useEffect(() => {
         if (currentSpace !== '') {
