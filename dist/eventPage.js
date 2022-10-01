@@ -25,9 +25,4 @@ chrome.contextMenus.onClicked.addListener(function(clickData){
     }
 })
 
-chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
-    if (message.from == "content"){
-        console.log(message)
-    }
-})
 
