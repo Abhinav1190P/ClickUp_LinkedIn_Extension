@@ -101,7 +101,9 @@ function Popup() {
         }
     })
 
-
+    chrome.storage.sync.get('fav', function (fav) {
+       console.log(fav)
+    })
 
 
 

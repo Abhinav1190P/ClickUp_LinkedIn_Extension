@@ -21,7 +21,9 @@ chrome.contextMenus.create(chromeContextMenu)
 
 chrome.contextMenus.onClicked.addListener(function(clickData){
     if(clickData.menuItemId=="GetPost"){
-        console.log(clickData)
+        chrome.storage.sync.get("fav",function(fav){
+            console.log(fav)
+        })
     }
 })
 

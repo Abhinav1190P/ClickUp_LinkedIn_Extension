@@ -22,13 +22,13 @@ function allElementsFromPoint(x, y) {
 
     elements.reverse();
     var last_item = elements[elements.length - 1]
-    /*    alert(JSON.stringify(last_item.innerHTML)) */
+
 
 }
 
 
 document.addEventListener('contextmenu', e => {
-    e.preventDefault();
+
     var d = document.querySelectorAll('.relative')
     for (var i = 0; i < d.length; i++) {
         var g = JSON.stringify(d[i].innerHTML.toString())
@@ -42,16 +42,15 @@ document.addEventListener('contextmenu', e => {
         }
     }
 
-    /*     allElementsFromPoint(e.clientX, e.clientY) */
-},{passive:true})
+
+})
 const myFunc = (e) => {
 
     var classN = e.target.getAttribute('class')
-    var theEl = document.querySelector("."+classN)
-    var theS =theEl.parentElement.getAttribute('data-id')
-    alert(theS.split(':')[3])
- 
-}   
+    var theEl = document.querySelector("." + classN)
+    var theS = theEl.parentElement.innerHTML
+    
+}
 
 
 
