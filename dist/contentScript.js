@@ -49,7 +49,8 @@ const myFunc = (e) => {
     var classN = e.target.getAttribute('class')
     var theEl = document.querySelector("." + classN)
     var theS = theEl.parentElement.innerHTML
-    
+
+    chrome.runtime.sendMessage({ from: "post", message: theS });
 }
 
 

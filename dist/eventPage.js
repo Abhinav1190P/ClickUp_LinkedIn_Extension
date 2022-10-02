@@ -27,4 +27,13 @@ chrome.contextMenus.onClicked.addListener(function(clickData){
     }
 })
 
+chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
+    if(message.from == "post"){
+        var name = message.message?.split('<span dir="ltr">')[1].split('</span>')[0]
+        var oned = message.message?.split('<span class="break-words">')[1].split('<span><span dir="ltr">')[1].split('<a href="https://www.linkedin.com/feed/hashtag/?')[0]
+        var twod = oned.replace(/<br>/g, "");
+        console.log(twod)
+    }
+});
+
 
