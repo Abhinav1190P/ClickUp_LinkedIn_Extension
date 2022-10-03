@@ -52,6 +52,9 @@ function Popup() {
     const [currentList, setCurrentList] = useState('')
     const [currentFolder, setCurrentFolder] = useState('')
     const { isOpen, onOpen, onClose } = useDisclosure()
+    const [globalList, setglobalList] = useState('')
+
+
     const btnRef = React.useRef()
 
 
@@ -81,6 +84,16 @@ function Popup() {
     ]
 
 
+    chrome.storage.sync.get('global_list', function (global_list) {
+        if (global_list.global_list) {
+            setglobalList(global_list.global_list)
+        }
+        else {
+            setglobalList('')
+        }
+    })
+
+
     chrome.storage.sync.get('code', function (code) {
         if (code.code) {
             SetCode(code.code)
@@ -95,6 +108,7 @@ function Popup() {
     chrome.storage.sync.get('access_token', function (access_token) {
         if (access_token) {
             setAccessToken(access_token.access_token)
+            chrome.storage.local.set({ "local_token": { local_token: access_token.access_token } })
         }
         else if (Code.length > 0) {
             GetMyAccessToken(Code)
@@ -102,7 +116,7 @@ function Popup() {
     })
 
     chrome.storage.sync.get('fav', function (fav) {
-       console.log(fav)
+        console.log(fav)
     })
 
 
@@ -267,16 +281,26 @@ function Popup() {
                         spacing={1}
                         alignItems={'flex-start'} w="80%" h="100%">
                         <Heading size={'xl'} fontWeight={700} fontFamily={'monospace'}>
-                            Saved posts
+                            {
+                                globalList !== '' ? (
+                                    "Saved posts"
+                                ) : ("Linkedin posts")
+                            }
+
                         </Heading>
-                        <HStack spacing={1}>
-                            <Text fontSize={'13px'} fontWeight={700} fontFamily={'monospace'}>
-                                4 posts inside
-                            </Text>
-                            <Text fontSize={'13px'} fontWeight={700} fontFamily={'monospace'} textDecoration={'underline'}>
-                                list
-                            </Text>
-                        </HStack>
+                        {
+                            globalList !== '' ? (
+                                <HStack spacing={1}>
+                                    <Text fontSize={'13px'} fontWeight={700} fontFamily={'monospace'}>
+                                        4 posts inside
+                                    </Text>
+                                    <Text fontSize={'13px'} fontWeight={700} fontFamily={'monospace'} textDecoration={'underline'}>
+                                        list
+                                    </Text>
+                                </HStack>
+                            ) : (null)
+                        }
+
                     </VStack>
                     <Flex
                         alignItems={'center'} justifyContent={'center'} w="20%" h="100%">
@@ -325,219 +349,227 @@ function Popup() {
 
                     </Flex>
                 </HStack>
+                {
+                    globalList !== '' ? (
+                        <Accordion
+                            allowToggle
+                            overflow={'scroll'} h="480px" w="100%">
+                            {Spaces?.map((item, i) => (
+                                <AccordionItem
+                                    onClick={() => { setCurrentSpace(item.id) }}
+                                    borderTop={'none'}
+                                    borderColor={'gray.100'}
+                                    key={i} w="100%">
+                                    <h2>
+                                        <AccordionButton>
+                                            <Box flex='1' textAlign='left'>
+                                                <Text
+                                                    fontSize={'25px'}
+                                                    fontWeight={700} fontFamily={'monospace'}>
+                                                    {item.name}
+                                                </Text>
+                                            </Box>
+                                            <AccordionIcon />
+                                        </AccordionButton>
+                                    </h2>
+                                    <AccordionPanel
+                                        minH={'30vh'}
+                                        bg={'purple.50'}
+                                        bgImage={"url('/twirl.png')"}
+                                        bgPosition="right"
+                                        bgSize={'100%'}
+                                        bgRepeat="no-repeat"
+                                        pb={4}>
+                                        <VStack w="100%" h="100%">
+                                            <Box w="100%" h="95%" bg="white">
+                                                {
+                                                    Folders && Folders.length > 0 ? (
+                                                        Folders?.map((item, i) => (
+                                                            <Box key={i}>
 
-                <Accordion
-                    allowToggle
-                    overflow={'scroll'} h="480px" w="100%">
-                    {Spaces?.map((item, i) => (
-                        <AccordionItem
-                            onClick={() => { setCurrentSpace(item.id) }}
-                            borderTop={'none'}
-                            borderColor={'gray.100'}
-                            key={i} w="100%">
-                            <h2>
-                                <AccordionButton>
-                                    <Box flex='1' textAlign='left'>
-                                        <Text
-                                            fontSize={'25px'}
-                                            fontWeight={700} fontFamily={'monospace'}>
-                                            {item.name}
-                                        </Text>
-                                    </Box>
-                                    <AccordionIcon />
-                                </AccordionButton>
-                            </h2>
-                            <AccordionPanel
-                                minH={'30vh'}
-                                bg={'purple.50'}
-                                bgImage={"url('/twirl.png')"}
-                                bgPosition="right"
-                                bgSize={'100%'}
-                                bgRepeat="no-repeat"
-                                pb={4}>
-                                <VStack w="100%" h="100%">
-                                    <Box w="100%" h="95%" bg="white">
-                                        {
-                                            Folders && Folders.length > 0 ? (
-                                                Folders?.map((item, i) => (
-                                                    <Box key={i}>
+                                                                <VStack py={3} alignItems={'flex-start'} px={3}>
 
-                                                        <VStack py={3} alignItems={'flex-start'} px={3}>
+                                                                    <Link
+                                                                        color={'purple.400'}
+                                                                        fontFamily={'monospace'}
+                                                                        fontWeight={700} fontSize={'lg'}>
+                                                                        <Icon as={AiTwotoneFolderOpen} w={3} h={3} /> {item.name}
+                                                                    </Link>
+                                                                    <Text
+                                                                        color={'purple.400'}
+                                                                        fontFamily={'monospace'}
+                                                                        fontWeight={700}
+                                                                        fontSize={'15px'}
+                                                                    >
+                                                                        <Icon as={MdFilterList} w={3} h={3} /> Lists:
+                                                                    </Text>
 
-                                                            <Link
-                                                                color={'purple.400'}
-                                                                fontFamily={'monospace'}
-                                                                fontWeight={700} fontSize={'lg'}>
-                                                                <Icon as={AiTwotoneFolderOpen} w={3} h={3} /> {item.name}
-                                                            </Link>
-                                                            <Text
-                                                                color={'purple.400'}
-                                                                fontFamily={'monospace'}
-                                                                fontWeight={700}
-                                                                fontSize={'15px'}
-                                                            >
-                                                                <Icon as={MdFilterList} w={3} h={3} /> Lists:
-                                                            </Text>
+                                                                    {
+                                                                        item.lists && item.lists.length > 0 ? (
+                                                                            item.lists?.map((item2, i) => (
+                                                                                <Box w="100%" key={i}>
 
-                                                            {
-                                                                item.lists && item.lists.length > 0 ? (
-                                                                    item.lists?.map((item2, i) => (
-                                                                        <Box w="100%" key={i}>
+                                                                                    <Link
+                                                                                        color={'purple.400'}
+                                                                                        fontFamily={'monospace'}
+                                                                                        fontWeight={700}
+                                                                                        ref={btnRef}
+                                                                                        fontSize={'13px'}
+                                                                                        onClick={() => { setCurrentList(item2.id); setCurrentFolder(item.id); GetMyTasks(item2.id), onOpen() }}
+                                                                                        px={5}
+                                                                                    >
+                                                                                        {item2.name}
+                                                                                    </Link>
 
-                                                                            <Link
-                                                                                color={'purple.400'}
-                                                                                fontFamily={'monospace'}
-                                                                                fontWeight={700}
-                                                                                ref={btnRef}
-                                                                                fontSize={'13px'}
-                                                                                onClick={() => { setCurrentList(item2.id); setCurrentFolder(item.id); GetMyTasks(item2.id), onOpen() }}
-                                                                                px={5}
-                                                                            >
-                                                                                {item2.name}
-                                                                            </Link>
-
-                                                                        </Box>
-                                                                    ))
-                                                                ) : (<Box>
-                                                                    No lists
-                                                                </Box>)
-
-
-                                                            }
-
-                                                        </VStack>
-
-                                                    </Box>
-                                                ))
-                                            ) : (<Box>
-                                                No folders</Box>)
-                                        }
-                                        <Drawer
-                                            isOpen={isOpen}
-                                            placement='bottom'
-                                            onClose={onClose}
-                                            finalFocusRef={btnRef}
-                                        >
-                                            <DrawerOverlay />
-                                            <DrawerContent h="500px">
-                                                <DrawerCloseButton />
-                                                <DrawerHeader fontWeight={700} fontFamily={'monospace'}>
-                                                    Your LinkendIn posts</DrawerHeader>
-
-                                                <DrawerBody>
-                                                    <Accordion allowToggle h={'max-content'} overflow={'scroll'}>
-                                                        {
-                                                            Tasks && Tasks.length > 0 ? (
-                                                                Tasks?.map((item, i) => (
+                                                                                </Box>
+                                                                            ))
+                                                                        ) : (<Box>
+                                                                            No lists
+                                                                        </Box>)
 
 
+                                                                    }
 
-                                                                    <AccordionItem minH={'10vh'} borderTop={'0px'} py={3} key={i}>
-                                                                        <h2>
-                                                                            <AccordionButton>
-                                                                                <HStack flex='1' textAlign='left'>
-                                                                                    <Tag
-                                                                                        w="11%"
-                                                                                        h="90%"
-                                                                                        borderRadius={'300px'}
-                                                                                        bg={gradients[Math.floor(Math.random() * gradients.length)].backgroundColor}
-                                                                                        bgImage={gradients[Math.floor(Math.random() * gradients.length)].backgroundImage}
-                                                                                        border={'5px solid white'}
+                                                                </VStack>
 
-                                                                                    >{""}</Tag>
-                                                                                    <Text fontWeight={800} fontFamily={'monospace'}>
-                                                                                        {item.name}
-                                                                                    </Text>
-                                                                                </HStack>
-                                                                                <AccordionIcon />
-                                                                            </AccordionButton>
-                                                                        </h2>
-                                                                        <AccordionPanel h={'40vh'} pb={4}>
-                                                                            <SimpleGrid>
+                                                            </Box>
+                                                        ))
+                                                    ) : (<Box>
+                                                        No folders</Box>)
+                                                }
+                                                <Drawer
+                                                    isOpen={isOpen}
+                                                    placement='bottom'
+                                                    onClose={onClose}
+                                                    finalFocusRef={btnRef}
+                                                >
+                                                    <DrawerOverlay />
+                                                    <DrawerContent h="500px">
+                                                        <DrawerCloseButton />
+                                                        <DrawerHeader fontWeight={700} fontFamily={'monospace'}>
+                                                            Your LinkendIn posts</DrawerHeader>
 
-                                                                            </SimpleGrid>
-                                                                        </AccordionPanel>
-                                                                    </AccordionItem>
-
-                                                                ))
-                                                            ) : (<Box>
-                                                                No tasks</Box>)
-                                                        }
-                                                    </Accordion>
-                                                </DrawerBody>
-
-                                                <DrawerFooter>
-                                                    <Button variant='outline' mr={3} onClick={onClose}>
-                                                        Cancel
-                                                    </Button>
-                                                    <Button colorScheme='blue'>Save</Button>
-                                                </DrawerFooter>
-                                            </DrawerContent>
-                                        </Drawer>
-                                    </Box>
-
-                                    <Flex
-                                        alignItems={'center'} justifyContent={'flex-start'} w="100%" h="5%">
-                                        <Avatar
-                                            size={'sm'}
-                                            marginTop={'8'}
-                                            name='Christian Nwamba' src='https://bit.ly/code-beast' />
-                                    </Flex>
-                                </VStack>
-                            </AccordionPanel>
-
-                            {/*  */}
-                        </AccordionItem>
-                    ))}
+                                                        <DrawerBody>
+                                                            <Accordion allowToggle h={'max-content'} overflow={'scroll'}>
+                                                                {
+                                                                    Tasks && Tasks.length > 0 ? (
+                                                                        Tasks?.map((item, i) => (
 
 
-                </Accordion>
+
+                                                                            <AccordionItem minH={'10vh'} borderTop={'0px'} py={3} key={i}>
+                                                                                <h2>
+                                                                                    <AccordionButton>
+                                                                                        <HStack flex='1' textAlign='left'>
+                                                                                            <Tag
+                                                                                                w="11%"
+                                                                                                h="90%"
+                                                                                                borderRadius={'300px'}
+                                                                                                bg={gradients[Math.floor(Math.random() * gradients.length)].backgroundColor}
+                                                                                                bgImage={gradients[Math.floor(Math.random() * gradients.length)].backgroundImage}
+                                                                                                border={'5px solid white'}
+
+                                                                                            >{""}</Tag>
+                                                                                            <Text fontWeight={800} fontFamily={'monospace'}>
+                                                                                                {item.name}
+                                                                                            </Text>
+                                                                                        </HStack>
+                                                                                        <AccordionIcon />
+                                                                                    </AccordionButton>
+                                                                                </h2>
+                                                                                <AccordionPanel h={'40vh'} pb={4}>
+                                                                                    <SimpleGrid>
+
+                                                                                    </SimpleGrid>
+                                                                                </AccordionPanel>
+                                                                            </AccordionItem>
+
+                                                                        ))
+                                                                    ) : (<Box>
+                                                                        No tasks</Box>)
+                                                                }
+                                                            </Accordion>
+                                                        </DrawerBody>
+
+                                                        <DrawerFooter>
+                                                            <Button variant='outline' mr={3} onClick={onClose}>
+                                                                Cancel
+                                                            </Button>
+                                                            <Button colorScheme='blue'>Save</Button>
+                                                        </DrawerFooter>
+                                                    </DrawerContent>
+                                                </Drawer>
+                                            </Box>
+
+                                            <Flex
+                                                alignItems={'center'} justifyContent={'flex-start'} w="100%" h="5%">
+                                                <Avatar
+                                                    size={'sm'}
+                                                    marginTop={'8'}
+                                                    name='Christian Nwamba' src='https://bit.ly/code-beast' />
+                                            </Flex>
+                                        </VStack>
+                                    </AccordionPanel>
+
+                                    {/*  */}
+                                </AccordionItem>
+                            ))}
+
+
+                        </Accordion>
+                    ) : (null)
+                }
+
+
             </VStack>
-            <HStack
-                alignItems={'flex-start'} justifyContent={'center'} w="90%" h="15%">
-                <HStack
-                    bg="purple.50" borderRadius={'30px'}
-                    px={5}
-                    alignItems={'center'} justifyContent={'space-between'} w="95%" h="100%">
-                    <HStack w="20%" h="100%">
-                        <IconButton icon={<HiOutlineHome />}
+            {
+                globalList !== '' ? (<HStack
+                    alignItems={'flex-start'} justifyContent={'center'} w="90%" h="15%">
+                    <HStack
+                        bg="purple.50" borderRadius={'30px'}
+                        px={5}
+                        alignItems={'center'} justifyContent={'space-between'} w="95%" h="100%">
+                        <HStack w="20%" h="100%">
+                            <IconButton icon={<HiOutlineHome />}
+                                bg={'purple.300'}
+                                color={'white'}
+                                size={'sm'} />
+                            <Text fontSize={'15px'} fontWeight={700} fontFamily={'sans-serif'}>
+                                Home
+                            </Text>
+                        </HStack>
+
+                        <HStack justifyContent={'space-between'}
+                            borderRadius={'30px'}
+                            px={3} bg="purple.100" w="25%" h="50%">
+                            <Icon
+                                w={6}
+                                h={6}
+                                opacity={.7}
+                                cursor={'pointer'}
+                                _active={{ opacity: .9 }}
+                                as={RiDraftLine}
+                            />
+                            <Icon
+                                w={4}
+                                h={4}
+                                opacity={.7}
+                                cursor={'pointer'}
+                                _active={{ opacity: .9 }}
+                                as={BsThreeDotsVertical} />
+
+                        </HStack>
+                    </HStack>
+
+                    <HStack w="5%" h="100%">
+                        <IconButton icon={<RiAddLine />}
+                            size={'sm'}
                             bg={'purple.300'}
-                            color={'white'}
-                            size={'sm'} />
-                        <Text fontSize={'15px'} fontWeight={700} fontFamily={'sans-serif'}>
-                            Home
-                        </Text>
+                            color={'white'} />
                     </HStack>
+                </HStack>) : (null)
+            }
 
-                    <HStack justifyContent={'space-between'}
-                        borderRadius={'30px'}
-                        px={3} bg="purple.100" w="25%" h="50%">
-                        <Icon
-                            w={6}
-                            h={6}
-                            opacity={.7}
-                            cursor={'pointer'}
-                            _active={{ opacity: .9 }}
-                            as={RiDraftLine}
-                        />
-                        <Icon
-                            w={4}
-                            h={4}
-                            opacity={.7}
-                            cursor={'pointer'}
-                            _active={{ opacity: .9 }}
-                            as={BsThreeDotsVertical} />
-
-                    </HStack>
-                </HStack>
-
-                <HStack w="5%" h="100%">
-                    <IconButton icon={<RiAddLine />}
-                        size={'sm'}
-                        bg={'purple.300'}
-                        color={'white'} />
-                </HStack>
-            </HStack>
 
         </VStack>
     )

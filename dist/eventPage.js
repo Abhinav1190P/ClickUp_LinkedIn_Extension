@@ -19,10 +19,59 @@ var chromeContextMenu = {
 
 chrome.contextMenus.create(chromeContextMenu)
 
+
+
 chrome.contextMenus.onClicked.addListener(function (clickData) {
+
+
+
+
     if (clickData.menuItemId == "GetPost") {
+
+
         chrome.storage.sync.get("fav", function (fav) {
-            console.log(fav)
+
+
+
+            var rawobj = fav?.fav
+            var obj = {
+                name: rawobj.user_name,
+                description: rawobj.desc
+            }
+
+
+            const CreateTask = async () => {
+
+                try {
+
+                    chrome.storage.local.get("local_token", async function (hey) {
+                        let sh = hey.local_token
+                        if (sh.local_token?.length > 0) {
+                            console.log(obj)
+                            const data = await fetch(`https://api.clickup.com/api/v2/list/199318863/task`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    "Authorization": sh.local_token
+                                },
+                                body: JSON.stringify(obj)
+                            })
+                            const newtask = await data.json()
+                            console.log(newtask)
+                        }
+
+                    })
+
+
+                } catch (error) {
+                    console.log(error.message)
+                }
+
+
+            }
+
+            CreateTask()
+
         })
     }
 })
@@ -46,21 +95,21 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
             twod = oned.split('</span></span>')[0]
         }
 
-       var images = message.message.match(/<img.*?src="(.*?)"/g)
-       var profileimage = images[0].split('"')[1]
+        var images = message.message.match(/<img.*?src="(.*?)"/g)
+        var profileimage = images[0].split('"')[1]
 
-       var allImages = []
+        var allImages = []
 
-       for(var j = 0; j < images.length; j++){
-        var anImage = images[j].includes('width=')
-        if(anImage){
-            var postImg = images[j]
-            allImages.push(postImg)
+        for (var j = 0; j < images.length; j++) {
+            var anImage = images[j].includes('width=')
+            if (anImage) {
+                var postImg = images[j]
+                allImages.push(postImg)
+            }
+
         }
-  
-       }
-       
-       
+
+
         var threed = twod.replace(/<br>/g, "");
         var finalDesc = ''
         var splitter = threed.split('</a>')
@@ -74,11 +123,10 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
             user_name: name,
             hashes: hash_list,
             desc: finalDesc,
-            imgs:allImages,
-            user_profile:profileimage
+            imgs: allImages,
+            user_profile: profileimage
         }
-        console.log(obj)
-
+        chrome.storage.sync.set({ "fav": obj })
 
 
     }
