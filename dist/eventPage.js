@@ -31,36 +31,44 @@ chrome.contextMenus.onClicked.addListener(function (clickData) {
 
         chrome.storage.sync.get("fav", function (fav) {
 
+            var token = ''
+            chrome.storage.local.get("local_token", function (hey) {
+                token = hey?.local_token
+                if (token !== '') {
+                    CreateTask(token)
+                }
+            })
 
 
-            var rawobj = fav?.fav
-            var obj = {
-                name: rawobj.user_name,
-                description: rawobj.desc
-            }
 
 
-            const CreateTask = async () => {
+            const CreateTask = async (t) => {
+
+                var rawobj = fav?.fav
+                var hashes = fav?.fav?.hashes
+
+
+                hashes?.push('linkedin')
+
+                var obj = {
+                    name: rawobj?.user_name,
+                    description: rawobj.desc,
+                    tags: hashes
+                }
+
 
                 try {
 
-                    chrome.storage.local.get("local_token", async function (hey) {
-                        let sh = hey.local_token
-                        if (sh.local_token?.length > 0) {
-                            console.log(obj)
-                            const data = await fetch(`https://api.clickup.com/api/v2/list/199318863/task`, {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    "Authorization": sh.local_token
-                                },
-                                body: JSON.stringify(obj)
-                            })
-                            const newtask = await data.json()
-                            console.log(newtask)
-                        }
-
+                    const data = await fetch(`https://api.clickup.com/api/v2/list/199318863/task`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            "Authorization": t?.local_token
+                        },
+                        body: JSON.stringify(obj)
                     })
+                    console.log(data)
+
 
 
                 } catch (error) {
@@ -68,9 +76,11 @@ chrome.contextMenus.onClicked.addListener(function (clickData) {
                 }
 
 
+
+
             }
 
-            CreateTask()
+
 
         })
     }
@@ -78,8 +88,8 @@ chrome.contextMenus.onClicked.addListener(function (clickData) {
 
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     if (message.from == "post") {
-        var name = message.message?.split('<span dir="ltr">')[1].split('</span>')[0]
-        var oned = message.message?.split('<span class="break-words">')[1].split('<span><span dir="ltr">')[1]
+        var name = message?.message?.split('<span dir="ltr">')[1].split('</span>')[0]
+        var oned = message?.message?.split('<span class="break-words">')[1].split('<span><span dir="ltr">')[1]
         var twod
         var hashtags = '';
         var hash_list = []
@@ -95,19 +105,20 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
             twod = oned.split('</span></span>')[0]
         }
 
-        var images = message.message.match(/<img.*?src="(.*?)"/g)
-        var profileimage = images[0].split('"')[1]
 
-        var allImages = []
 
-        for (var j = 0; j < images.length; j++) {
-            var anImage = images[j].includes('width=')
-            if (anImage) {
-                var postImg = images[j]
-                allImages.push(postImg)
+        var images = message.message.match(/<img([\w\W]+?)>/g);
+        console.log(images)
+        var imgString = ''
+        images?.map((item, i) => {
+            if (item.includes('width=') || item.includes('avatar')) {
+                imgString = item + '\n' + imgString
             }
 
-        }
+        })
+
+
+
 
 
         var threed = twod.replace(/<br>/g, "");
@@ -122,12 +133,9 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
         let obj = {
             user_name: name,
             hashes: hash_list,
-            desc: finalDesc,
-            imgs: allImages,
-            user_profile: profileimage
+            desc: finalDesc + '\n' + '\n' + "<---Images--->" + '\n' + '\n' + '\n' + imgString,
         }
         chrome.storage.sync.set({ "fav": obj })
-
 
     }
 });

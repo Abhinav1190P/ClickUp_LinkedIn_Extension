@@ -53,6 +53,7 @@ const myFunc = (e) => {
     var theS = theEl.parentElement.innerHTML
 
     chrome.runtime.sendMessage({ from: "post", message: theS });
+
 }
 
 
