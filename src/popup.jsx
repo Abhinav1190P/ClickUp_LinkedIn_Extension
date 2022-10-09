@@ -377,7 +377,7 @@ function Popup() {
                                 </AccordionButton>
                             </h2>
                             <AccordionPanel
-                                minH={'30vh'}
+                                h={'max-content'}
                                 bg={'purple.50'}
                                 bgImage={"url('/twirl.png')"}
                                 bgPosition="right"
@@ -449,7 +449,7 @@ function Popup() {
                                         >
                                             <DrawerOverlay />
                                             <DrawerContent h="700px">
-                                                
+
 
                                                 <DrawerBody>
                                                     <Accordion allowToggle h={'max-content'} overflow={'scroll'}>
@@ -474,7 +474,7 @@ function Popup() {
                                                                     return (
 
 
-                                                                        <AccordionItem minH={'10vh'} borderTop={'0px'} py={3} key={i}>
+                                                                        <AccordionItem borderTop={'0px'} py={3} key={i}>
                                                                             <h2>
                                                                                 <AccordionButton>
                                                                                     <HStack flex='1' textAlign='left'>
@@ -504,33 +504,50 @@ function Popup() {
                                                                                 </AccordionButton>
                                                                             </h2>
                                                                             <AccordionPanel h={'max-content'} pb={4}>
-                                                                                <SimpleGrid h="100%" columns={1}>
-                                                                                    <GridItem h="80%">
+                                                                                <Flex
+                                                                                bg="gray.50"
+                                                                                flexDirection={'column'}
+                                                                                paddingBottom={3} w="100%" alignItems={'center'} justifyContent={'center'}>
+                                                                                    {
+                                                                                        posts && posts.length > 0 ? (
+                                                                                            posts?.map((im, i) => {
+                                                                                              
+                                                                                                return (
+                                                                                                    <Image w="70%" src={im?.replace(/&amp;/g, '&').split('src="')[1]?.split('"')[0]} key={i} alt="ko" />
+                                                                                                )
+                                                                                            })
 
-                                                                                        <Box boxSize={''}>
-                                                                                            {
-                                                                                                posts && posts.length > 0 ? (
-                                                                                                    posts?.map((im, i) => {
-                                                                                                        console.log(im.split('"')[1]?.split('"')[0])
-                                                                                                        return (
-                                                                                                            <Image src={im?.replace(/&amp;/g, '&').split('src="')[1]?.split('"')[0]} key={i} alt="ko" />
-                                                                                                        )
-                                                                                                    })
+                                                                                        ) : (<Box>No post images</Box>)
+                                                                                    }
+                                                                                </Flex>
 
-                                                                                                ) : (<Box>No post images</Box>)
-                                                                                            }
-                                                                                        </Box>
 
-                                                                                        <Textarea
-                                                                                            h="100%"
-                                                                                            value={item?.description?.split('<---Images--->')[0].trim()}
+                                                                                <Textarea
+                                                                                fontSize={'sm'}
+                                                                                    minH={'35vh'}
+                                                                                    value={item?.description?.split('<---Images--->')[0].trim()}
+                                                                                    onChange={(e) => { }}
+                                                                                    fontFamily={'monospace'}
+                                                                                    fontWeight={600}
+                                                                                />
+                                                                                <Flex w="100%" flexWrap={'wrap'}>
+                                                                                    {
+                                                                                        item.tags && item.tags.length > 0 ? (
+                                                                                            item.tags?.map((tag, i) => (
+                                                                                                <HStack py={1}>
+                                                                                                    <Tag
+                                                                                                        size={'sm'}
+                                                                                                        key={i} color={'white'} bg={tag.tag_fg}>
+                                                                                                        {tag.name}
+                                                                                                    </Tag>
+                                                                                                </HStack>
+                                                                                            )
+                                                                                            )
+                                                                                        ) : null
+                                                                                    }
+                                                                                </Flex>
 
-                                                                                            onChange={(e) => { }}
-                                                                                            fontFamily={'monospace'}
-                                                                                            fontWeight={600}
-                                                                                        />
-                                                                                    </GridItem>
-                                                                                </SimpleGrid>
+
                                                                             </AccordionPanel>
                                                                         </AccordionItem>
                                                                     )
