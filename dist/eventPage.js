@@ -34,15 +34,20 @@ chrome.contextMenus.onClicked.addListener(function (clickData) {
             var token = ''
             chrome.storage.local.get("local_token", function (hey) {
                 token = hey?.local_token
-                if (token !== '') {
-                    CreateTask(token)
-                }
+
+                chrome.storage.sync.get('global_list', function (global_list) {
+                    if (global_list.global_list) {
+                        var listId = global_list?.global_list
+                        CreateTask(token, listId)
+                    }
+                })
             })
 
 
 
 
-            const CreateTask = async (t) => {
+
+            const CreateTask = async (t, l) => {
 
                 var rawobj = fav?.fav
                 var hashes = fav?.fav?.hashes
@@ -59,7 +64,7 @@ chrome.contextMenus.onClicked.addListener(function (clickData) {
 
                 try {
 
-                    const data = await fetch(`https://api.clickup.com/api/v2/list/199318863/task`, {
+                    const data = await fetch(`https://api.clickup.com/api/v2/list/${l}/task`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -88,12 +93,13 @@ chrome.contextMenus.onClicked.addListener(function (clickData) {
 
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     if (message.from == "post") {
-        console.log(message.message)
+
         var name = message?.message?.split('<span dir="ltr">')[1].split('</span>')[0]
         var oned = message?.message?.split('<span class="break-words">')[1].split('<span><span dir="ltr">')[1]
         var twod
         var hashtags = '';
         var hash_list = []
+        console.log(message.message)
 
         if (oned.includes('<br><a href="https://www.linkedin.com/feed/hashtag/?')) {
             twod = oned.split('<br><a href="https://www.linkedin.com/feed/hashtag/?')[0]
@@ -117,8 +123,6 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
             }
 
         })
-
-
 
 
 
