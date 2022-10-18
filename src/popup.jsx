@@ -501,11 +501,16 @@ function Popup() {
 
                                                                                 if (z.includes('feed-shared-actor__avatar-image')) return null;
                                                                                 if (z.includes('profile photo')) return null
+                                                                                if(z.includes('EntityPhoto-circle')) return null
 
                                                                                 else return z
 
 
                                                                             })
+                                                                            
+                                                                            var videosContainer = item?.description?.split('<---Videos--->')[1]
+                                                                            var vids = videosContainer?.match(/<video[^>]*>/g)
+
 
                                                                             return (
 
@@ -549,7 +554,7 @@ function Popup() {
                                                                                                     posts?.map((im, i) => {
 
                                                                                                         return (
-                                                                                                            <Image w="70%" src={im?.replace(/&amp;/g, '&').split('src="')[1]?.split('"')[0]} key={i} alt="ko" />
+                                                                                                            <Image w="100%" src={im?.replace(/&amp;/g, '&').split('src="')[1]?.split('"')[0]} key={i} alt="ko" />
                                                                                                         )
                                                                                                     })
 
