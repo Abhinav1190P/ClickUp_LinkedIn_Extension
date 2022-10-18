@@ -35,6 +35,7 @@ import {
     Modal,
     ModalOverlay,
     ModalContent,
+    Spinner,
     ModalHeader,
     ModalFooter,
     ModalBody,
@@ -510,7 +511,7 @@ function Popup() {
                                                                             
                                                                             var videosContainer = item?.description?.split('<---Videos--->')[1]
                                                                             var vids = videosContainer?.match(/<video[^>]*>/g)
-
+                                                                           
 
                                                                             return (
 
@@ -558,7 +559,18 @@ function Popup() {
                                                                                                         )
                                                                                                     })
 
-                                                                                                ) : (<Box>No post images</Box>)
+                                                                                                ) : (null)
+                                                                                            }
+                                                                                            {
+                                                                                               vids && vids.length > 0 ? (
+                                                                                                vids?.map((vi, i) => {
+
+                                                                                                    return (
+                                                                                                        <video w="100%" src={vi?.replace(/&amp;/g, '&').split('src="')[1]?.split('"')[0]} key={i} autoplay="autoplay" />
+                                                                                                    )
+                                                                                                })
+
+                                                                                            ) : (null) 
                                                                                             }
                                                                                         </Flex>
 
@@ -593,8 +605,8 @@ function Popup() {
                                                                                 </AccordionItem>
                                                                             )
                                                                         })
-                                                                    ) : (<Box>
-                                                                        No tasks</Box>)
+                                                                    ) : (
+                                                                    <Flex w="100%" h="500px" alignItems={'center'} justifyContent={'center'}><Spinner color='purple.500' /></Flex>)
                                                                 }
                                                             </Accordion>
                                                         </DrawerBody>
