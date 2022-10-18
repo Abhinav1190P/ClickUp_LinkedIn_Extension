@@ -57,7 +57,7 @@ chrome.contextMenus.onClicked.addListener(function (clickData) {
 
                 var obj = {
                     name: rawobj?.user_name,
-                    description: rawobj.desc,
+                    description: rawobj?.desc,
                     tags: hashes
                 }
 
@@ -99,7 +99,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
         var twod
         var hashtags = '';
         var hash_list = []
-    
+
 
         if (oned.includes('<br><a href="https://www.linkedin.com/feed/hashtag/?')) {
             twod = oned.split('<br><a href="https://www.linkedin.com/feed/hashtag/?')[0]
@@ -115,7 +115,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
 
 
         var images = message.message.match(/<img([\w\W]+?)>/g);
-        
+
         var imgString = ''
         images?.map((item, i) => {
             if (item.includes('width=') || item.includes('avatar') || item.includes('feed-shared-article')) {
@@ -128,7 +128,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
         var videos = message.message.match(/<video([\w\W]+?)>/g)
         var videoString = ''
         videos?.map((item, i) => {
-                videoString = item + '\n' + videoString 
+            videoString = item + '\n' + videoString
         })
 
         var threed = twod.replace(/<br>/g, "");
@@ -145,7 +145,8 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
             hashes: hash_list,
             desc: finalDesc + '\n' + '\n' + "<---Images--->" + '\n' + '\n' + '\n' + imgString + '\n' + '\n' + "<---Videos--->" + '\n' + '\n' + '\n' + videoString,
         }
-        chrome.storage.sync.set({ "fav": obj }) 
+        console.log(obj)
+        chrome.storage.sync.set({ "fav": obj })
 
     }
 });

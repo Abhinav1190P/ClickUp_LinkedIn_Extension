@@ -293,7 +293,7 @@ function Popup() {
 
     return (
         <VStack margin={0} padding={0} borderRadius={'5px'} w="500px" h="700px">
-            <VStack spacing={10} p={6} w="100%" h="80%">
+            <VStack spacing={10} p={6} w="100%" h="100%">
                 <HStack w="100%" h="10%" alignItems={'center'}>
                     <VStack
                         spacing={1}
@@ -566,7 +566,7 @@ function Popup() {
                                                                                                 vids?.map((vi, i) => {
 
                                                                                                     return (
-                                                                                                        <video w="100%" src={vi?.replace(/&amp;/g, '&').split('src="')[1]?.split('"')[0]} key={i} autoplay="autoplay" />
+                                                                                                        <video w="100%" src={vi?.replace(/&amp;/g, '&').split('src="')[1]?.split('"')[0]} key={i} autoplay="autoplay" controls loop muted/>
                                                                                                     )
                                                                                                 })
 
@@ -898,54 +898,7 @@ function Popup() {
 
 
             </VStack>
-            {
-                globalList !== '' ? (<HStack
-                    alignItems={'flex-start'} justifyContent={'center'} w="90%" h="15%">
-                    <HStack
-                        bg="purple.50" borderRadius={'30px'}
-                        px={5}
-                        alignItems={'center'} justifyContent={'space-between'} w="95%" h="100%">
-                        <HStack w="20%" h="100%">
-                            <IconButton icon={<HiOutlineHome />}
-                                bg={'purple.300'}
-                                color={'white'}
-                                size={'sm'} />
-                            <Text fontSize={'15px'} fontWeight={700} fontFamily={'sans-serif'}>
-                                Home
-                            </Text>
-                        </HStack>
-
-                        <HStack justifyContent={'space-between'}
-                            borderRadius={'30px'}
-                            px={3} bg="purple.100" w="25%" h="50%">
-                            <Icon
-                                onClick={GloabalOnOpen}
-                                w={6}
-                                h={6}
-                                opacity={.7}
-                                cursor={'pointer'}
-                                _active={{ opacity: .9 }}
-                                as={RiDraftLine}
-                            />
-                            <Icon
-                                w={4}
-                                h={4}
-                                opacity={.7}
-                                cursor={'pointer'}
-                                _active={{ opacity: .9 }}
-                                as={BsThreeDotsVertical} />
-
-                        </HStack>
-                    </HStack>
-
-                    <HStack w="5%" h="100%">
-                        <IconButton icon={<RiAddLine />}
-                            size={'sm'}
-                            bg={'purple.300'}
-                            color={'white'} />
-                    </HStack>
-                </HStack>) : (null)
-            }
+         
 
 
         </VStack>
